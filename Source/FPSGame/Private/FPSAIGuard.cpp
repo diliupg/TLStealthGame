@@ -2,18 +2,21 @@
 
 
 #include "FPSAIGuard.h"
-#include "AIModule/Classes/Perception/PawnSensingComponent.h"
+#include "Perception/PawnSensingComponent.h"
+#include "DrawDebugHelpers.h"
 
 
 // Sets default values
-AFPSAIGuard::AFPSAIGuard()
+AFPSAIGuard::AFPSAIGuard() 
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>( TEXT( "PawnSensingComp" ) );
-}
 
+	PawnSensingComp->OnSeePawn.AddDynamic( this, &AFPSAIGuard::OnPawnSeen );
+}
+  
 // Called when the game starts or when spawned
 void AFPSAIGuard::BeginPlay()
 {
@@ -21,10 +24,17 @@ void AFPSAIGuard::BeginPlay()
 	
 }
 
+void AFPSAIGuard::OnPawnSeen( APawn* SeenPawn )
+{
+	if ( SeenPawn == nullptr )return;
+
+	DrawDebugSphere( GetWorld( ), SeenPawn->GetActorLocation( ), 32.f, 12, FColor::Red, false, 10.f );
+}
+
 // Called every frame
 void AFPSAIGuard::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	Super::Tick(DeltaTime); 
 
 }
 
