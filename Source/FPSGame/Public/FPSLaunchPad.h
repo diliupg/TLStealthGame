@@ -36,7 +36,7 @@ protected:
 	UPROPERTY( EditInstanceOnly, Category = Launchpad )
 	float LaunchPitchAngle;
 
-	UPROPERTY( EditInstanceOnly, Category = Launchpad )
+	UPROPERTY( EditDefaultsOnly, Category = Launchpad )
 	UParticleSystem* ActivateLaunchpadEffect;
 
 };
