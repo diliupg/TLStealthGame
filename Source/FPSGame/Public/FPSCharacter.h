@@ -13,6 +13,7 @@ class AFPSProjectile;
 class USoundBase;
 class UAnimSequence;
 class UParticleSystem;
+class UPawnNoiseEmitterComponent;
 
 
 UCLASS()
@@ -21,8 +22,7 @@ class AFPSCharacter : public ACharacter
 	GENERATED_BODY()
 
 protected:
-
-	/** Pawn mesh: 1st person view  */
+	/** Pawn mesh: 1st person view  */ 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mesh")
 	USkeletalMeshComponent* Mesh1PComponent;
 
@@ -40,6 +40,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Camera")
 	TSubclassOf<UCameraShakeBase> JumpCameraShake;
 
+	UPROPERTY( VisibleAnywhere, BlueprintReadOnly, Category = "AI" ) 
+	UPawnNoiseEmitterComponent* NoiseEmitterComponent;
 public:
 	AFPSCharacter();
 
