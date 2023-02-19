@@ -21,7 +21,7 @@ AFPSCharacter::AFPSCharacter()
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Mesh1PComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh"));
 	Mesh1PComponent->SetupAttachment(CameraComponent);
-	Mesh1PComponent->CastShadow = false;
+	Mesh1PComponent ->CastShadow = false;
 	Mesh1PComponent->SetRelativeRotation(FRotator(2.0f, -15.0f, 5.0f));
 	Mesh1PComponent->SetRelativeLocation(FVector(0, 0, -160.0f));
 

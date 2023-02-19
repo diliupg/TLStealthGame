@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
+#include "GameFramework/Actor.h"
 
 AFPSProjectile::AFPSProjectile() 
 {
@@ -78,7 +79,8 @@ void AFPSProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 
 			MatInst->SetVectorParameterValue("Color", NewColor);
 		}
-
-		Explode();
 	}
+
+	MakeNoise( 1.f, GetInstigator() );
+	Explode( );
 }
