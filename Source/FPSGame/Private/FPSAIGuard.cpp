@@ -5,6 +5,7 @@
 #include "Perception/PawnSensingComponent.h"
 #include "DrawDebugHelpers.h"
 #include "FPSGameMode.h"
+#include "AIModule/Classes/Blueprint/AIBlueprintHelperLibrary.h"
 
 
 // Sets default values
@@ -27,6 +28,11 @@ void AFPSAIGuard::BeginPlay()
 	Super::BeginPlay();
 
 	OriginalRotation = GetActorRotation( );
+
+	if ( bPatrol )
+	{
+		MoveToNextPatrolPoint( );
+	}
 }
 
 void AFPSAIGuard::OnPawnSeen( APawn* SeenPawn )
@@ -43,6 +49,12 @@ void AFPSAIGuard::OnPawnSeen( APawn* SeenPawn )
 
 	SetGuardState( EAIState::Alerted );
 
+	// STOP movement if Patrolling
+	AController* ThisController = GetController( );
+	if ( ThisController )
+	{
+		ThisController->StopMovement( );
+	}
 }
 
 void AFPSAIGuard::OnNoiseHeard( APawn* NoiseInstigator, const FVector& Location, float Volume )
@@ -62,6 +74,13 @@ void AFPSAIGuard::OnNoiseHeard( APawn* NoiseInstigator, const FVector& Location,
 	GetWorldTimerManager( ).SetTimer( FTH_ResetOrientation, this, &AFPSAIGuard::ResetOrientation, 3.f );
 
 	SetGuardState( EAIState::Suspicious );
+
+	// STOP movement if Patrolling
+	AController* ThisController = GetController( );
+	if ( ThisController )
+	{
+		ThisController->StopMovement( );
+	}
 }
 
 void AFPSAIGuard::ResetOrientation( )
@@ -71,20 +90,51 @@ void AFPSAIGuard::ResetOrientation( )
 	SetActorRotation( OriginalRotation );
 
 	SetGuardState( EAIState::Idle );
+
+	// stopped investigating... if it is a patrolling pawn, pick a new patrol point to move to
+	if ( bPatrol )
+	{
+		MoveToNextPatrolPoint( );
+	}
 }
 
 void AFPSAIGuard::SetGuardState( EAIState NewState )
 {
 	if ( GuardState == NewState ) return;
-	GuardState = NewState;
+	GuardState = NewState;  
 	OnStateChanged( GuardState );
 }
 
 // Called every frame
 void AFPSAIGuard::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime); 
+	Super::Tick(DeltaTime);
+
+	if ( CurrentPatrolPoint )
+	{
+		FVector Delta = GetActorLocation( ) - CurrentPatrolPoint->GetActorLocation( );
+		float DistanceToGoal = Delta.Size( );
+
+		// check if we are 50 units of our goal if so pick a new patrol point
+		if ( DistanceToGoal < 100 )
+		{
+			MoveToNextPatrolPoint( );
+		}
+	}
 
 }
 
+void AFPSAIGuard::MoveToNextPatrolPoint( )
+{
+	if ( CurrentPatrolPoint == nullptr || CurrentPatrolPoint == SecondPatrolPoint )
+	{
+		CurrentPatrolPoint = FirstPatrolPoint;
+	}
+	else
+	{
+		CurrentPatrolPoint = SecondPatrolPoint;
+	}
+
+	UAIBlueprintHelperLibrary::SimpleMoveToActor( GetController( ), CurrentPatrolPoint );
+}
 
